@@ -3,6 +3,7 @@ const cors = require('cors');
 const fs = require('fs').promises;
 const path = require('path');
 const { exec } = require('child_process');
+const yaml = require('js-yaml');
 
 const app = express();
 const PORT = 3001;
@@ -13,6 +14,8 @@ app.use(express.json());
 // Path to data files
 const DATA_PATH = path.join(__dirname, '../../../../data');
 const REPORTS_PATH = path.join(__dirname, '../../../../reports');
+const PROFILE_PATH = path.join(__dirname, '../../../../config/profile.yml');
+const CV_PATH = path.join(__dirname, '../../../../cv.md');
 
 app.get('/api/applications', async (req, res) => {
     try {
@@ -43,6 +46,42 @@ app.post('/api/scan', (req, res) => {
         }
         res.json({ output: stdout });
     });
+});
+
+app.get('/api/profile', async (req, res) => {
+    try {
+        const data = await fs.readFile(PROFILE_PATH, 'utf8');
+        res.json({ content: yaml.load(data) });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to read profile' });
+    }
+});
+
+app.post('/api/profile', async (req, res) => {
+    try {
+        await fs.writeFile(PROFILE_PATH, yaml.dump(req.body));
+        res.json({ success: true });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to save profile' });
+    }
+});
+
+app.get('/api/cv', async (req, res) => {
+    try {
+        const data = await fs.readFile(CV_PATH, 'utf8');
+        res.json({ content: data });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to read CV' });
+    }
+});
+
+app.post('/api/cv', async (req, res) => {
+    try {
+        await fs.writeFile(CV_PATH, req.body.content);
+        res.json({ success: true });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to save CV' });
+    }
 });
 
 app.listen(PORT, () => {
