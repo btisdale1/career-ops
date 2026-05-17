@@ -15,12 +15,23 @@ function App() {
 
   useEffect(() => {
     fetch('http://localhost:3001/api/applications').then(res => res.json()).then(data => {
+      if (!data?.content) return;
       const lines = data.content.split('\n');
       const tableRows = lines.slice(4);
       setApplications(tableRows.filter((row: string) => row.includes('|')).map((row: string) => {
         const cols = row.split('|').map((col) => col.trim());
-        const reportMatch = cols[8].match(/\((reports\/[^)]+)\)/);
-        return { id: cols[1], date: cols[2], company: cols[3], role: cols[4], score: cols[5], status: cols[6], pdf: cols[7], report: reportMatch ? reportMatch[1] : '', notes: cols[9] };
+        const reportMatch = cols[8]?.match(/\((reports\/[^)]+)\)/);
+        return { 
+          id: cols[1] || '', 
+          date: cols[2] || '', 
+          company: cols[3] || '', 
+          role: cols[4] || '', 
+          score: cols[5] || '', 
+          status: cols[6] || '', 
+          pdf: cols[7] || '', 
+          report: reportMatch ? reportMatch[1] : '', 
+          notes: cols[9] || '' 
+        };
       }));
     });
     fetch('http://localhost:3001/api/profile').then(res => res.json()).then(data => setProfile(data.content));

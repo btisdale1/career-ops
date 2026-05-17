@@ -110,9 +110,19 @@ claude   # Open Claude Code in this directory
 # Terminal TUI:
 # cd dashboard && go build -o career-dashboard . && ./career-dashboard --path ..
 
-# Web Dashboard:
-# cd web-dashboard/server && node index.js &
-# cd web-dashboard/client && npm start
+### Web Dashboard
+Open two separate terminal windows (or tabs):
+
+1. Start the Backend API (Port 3001):
+```bash
+cd dashboard/web-dashboard/server && node index.js
+```
+
+2. Start the Frontend Client (Port 3000):
+```bash
+cd dashboard/web-dashboard/client && npm start
+```
+*Note: Ensure your backend server is running before starting the frontend.*
 # Paste a job URL or run /career-ops
 ```
 
