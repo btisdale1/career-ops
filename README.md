@@ -67,8 +67,8 @@ Built by someone who used it to evaluate 740+ job offers, generate 100+ tailored
 
 | Feature | Description |
 |---------|-------------|
-| **Auto-Pipeline** | Paste a URL, get a full evaluation + PDF + tracker entry |
-| **6-Block Evaluation** | Role summary, CV match, level strategy, comp research, personalization, interview prep (STAR+R) |
+| **Web Dashboard** | React+Express browser interface: Pipeline visualization, report viewer, scan controls, and profile/CV manager |
+| **Auto-Pipeline** | Paste a URL, get a full evaluation + PDF + tracker entry || **6-Block Evaluation** | Role summary, CV match, level strategy, comp research, personalization, interview prep (STAR+R) |
 | **Interview Story Bank** | Accumulates STAR+Reflection stories across evaluations -- 5-10 master stories that answer any behavioral question |
 | **Negotiation Scripts** | Salary negotiation frameworks, geographic discount pushback, competing offer leverage |
 | **ATS PDF Generation** | Keyword-injected CVs with Space Grotesk + DM Sans design |
@@ -106,6 +106,13 @@ claude   # Open Claude Code in this directory
 # "Update my profile with this CV I'm pasting"
 
 # 6. Start using
+
+# Terminal TUI:
+# cd dashboard && go build -o career-dashboard . && ./career-dashboard --path ..
+
+# Web Dashboard:
+# cd web-dashboard/server && node index.js &
+# cd web-dashboard/client && npm start
 # Paste a job URL or run /career-ops
 ```
 
