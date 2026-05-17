@@ -54,7 +54,9 @@ export function createPipelineRouter(root) {
     });
 
     // Run the gemini agent in headless mode
-    const child = spawn('gemini', ['-p', '"/career-ops pipeline"'], { cwd: root, env: { ...process.env }, shell: true });
+    // We pass the full command as a single string to spawn because shell: true
+    // with an array of arguments causes /bin/sh to treat them as script arguments ($0, $1) instead of passing them to the command!
+    const child = spawn('gemini -p "/career-ops pipeline"', { cwd: root, env: { ...process.env }, shell: true });
 
     child.stdout.on('data', (data) => {
       res.write(`data: ${JSON.stringify({ type: 'stdout', text: data.toString() })}\n\n`);
