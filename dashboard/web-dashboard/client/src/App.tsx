@@ -57,9 +57,34 @@ function App() {
       .catch((err) => console.error(err));
   };
 
+  const [isScanning, setIsScanning] = useState(false);
+
+  const runScan = () => {
+    setIsScanning(true);
+    fetch('http://localhost:3001/api/scan', { method: 'POST' })
+      .then((res) => res.json())
+      .then((data) => {
+        alert('Scan completed!');
+        setIsScanning(false);
+      })
+      .catch((err) => {
+        console.error(err);
+        setIsScanning(false);
+      });
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 p-8">
-      <h1 className="text-3xl font-bold text-gray-900 mb-6">Career-Ops Pipeline</h1>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold text-gray-900">Career-Ops Pipeline</h1>
+        <button 
+          onClick={runScan}
+          disabled={isScanning}
+          className="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700 disabled:bg-gray-400"
+        >
+          {isScanning ? 'Scanning...' : 'Run Scan'}
+        </button>
+      </div>
       <div className="bg-white rounded-lg shadow-md overflow-hidden">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
