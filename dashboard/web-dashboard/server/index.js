@@ -10,7 +10,7 @@ app.use(cors());
 app.use(express.json());
 
 // Path to data files
-const DATA_PATH = path.join(__dirname, '../../data');
+const DATA_PATH = path.join(__dirname, '../../../../data');
 
 app.get('/api/applications', async (req, res) => {
     try {
