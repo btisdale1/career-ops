@@ -13,6 +13,12 @@ states:
     description: Offer evaluated with report, pending decision
     dashboard_group: evaluated
 
+  - id: interested
+    label: Interested
+    aliases: [interesado, interesada]
+    description: Interested in applying, preparing application
+    dashboard_group: interested
+
   - id: applied
     label: Applied
     aliases: [aplicado, enviada, aplicada, sent]
