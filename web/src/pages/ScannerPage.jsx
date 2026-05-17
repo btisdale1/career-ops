@@ -2,12 +2,13 @@ import { useState, useEffect, useRef } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../api/client.js';
 import { PageHeader, Button, Card, StatusBadge } from '../components/ui/index.jsx';
-import { Radar, Terminal, Inbox, ExternalLink, Play } from 'lucide-react';
+import { Radar, Terminal, Inbox, ExternalLink, Play, X } from 'lucide-react';
 
 export default function ScannerPage() {
   const [logs, setLogs] = useState([]);
   const [isScanning, setIsScanning] = useState(false);
   const [isEvaluating, setIsEvaluating] = useState(false);
+  const [error, setError] = useState(null);
   const logsEndRef = useRef(null);
   const queryClient = useQueryClient();
 
@@ -43,6 +44,7 @@ export default function ScannerPage() {
 
   const startEvaluate = () => {
     setIsEvaluating(true);
+    setError(null);
     setLogs([{ type: 'stdout', text: 'Starting AI Evaluation Pipeline...\n' }]);
     const evtSource = new EventSource('/api/pipeline/evaluate/stream');
     
@@ -51,6 +53,9 @@ export default function ScannerPage() {
       if (data.type === 'done') {
         setIsEvaluating(false);
         evtSource.close();
+        if (data.code !== 0 && data.code !== null) {
+          setError(`Process exited with code ${data.code}. See logs for details.`);
+        }
         refetchPipeline();
         queryClient.invalidateQueries(['applications']);
       } else {
@@ -60,6 +65,7 @@ export default function ScannerPage() {
     
     evtSource.onerror = (err) => {
       console.error('SSE Error:', err);
+      setError('Connection to evaluation stream failed.');
       setIsEvaluating(false);
       evtSource.close();
       refetchPipeline();
@@ -89,6 +95,18 @@ export default function ScannerPage() {
         }
       />
       
+      {error && (
+        <div className="mx-8 mt-4 p-4 bg-status-rejected/10 border border-status-rejected/30 rounded-lg flex items-start gap-3 animate-fade-in">
+          <div className="p-1 bg-status-rejected/20 rounded-full shrink-0">
+            <X className="w-4 h-4 text-status-rejected" />
+          </div>
+          <div>
+            <h4 className="text-sm font-medium text-status-rejected mb-1">Evaluation Failed</h4>
+            <p className="text-xs text-status-rejected/80">{error}</p>
+          </div>
+        </div>
+      )}
+
       <div className="flex-1 p-8 min-h-0 flex gap-6">
         {/* Scanner Terminal */}
         <Card className="flex-[3] flex flex-col bg-[#0d0d12] border-surface-300/30 font-mono text-xs overflow-hidden h-full">

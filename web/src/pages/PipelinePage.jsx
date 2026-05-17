@@ -16,7 +16,7 @@ const STATUSES = ['evaluated', 'interested', 'applied', 'responded', 'interview'
 export default function PipelinePage() {
   const [view, setView] = useState('table');
   const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState(null);
+  const [statusFilter, setStatusFilter] = useState('active');
   const [selectedApp, setSelectedApp] = useState(null);
   
   const queryClient = useQueryClient();
@@ -25,7 +25,12 @@ export default function PipelinePage() {
 
   const filtered = useMemo(() => {
     let result = apps;
-    if (statusFilter) result = result.filter(a => normalizeStatus(a.status) === statusFilter);
+    if (statusFilter === 'active') {
+      const inactive = ['discarded', 'rejected', 'skip'];
+      result = result.filter(a => !inactive.includes(normalizeStatus(a.status)));
+    } else if (statusFilter) {
+      result = result.filter(a => normalizeStatus(a.status) === statusFilter);
+    }
     if (search) {
       const q = search.toLowerCase();
       result = result.filter(a =>
@@ -73,9 +78,10 @@ export default function PipelinePage() {
           />
         </div>
         <div className="flex gap-1.5 flex-wrap">
+          <FilterChip label="Active" active={statusFilter === 'active'} onClick={() => setStatusFilter('active')} />
           <FilterChip label="All" active={!statusFilter} onClick={() => setStatusFilter(null)} />
           {STATUSES.map(s => (
-            <FilterChip key={s} label={s} active={statusFilter === s} onClick={() => setStatusFilter(s === statusFilter ? null : s)} />
+            <FilterChip key={s} label={s} active={statusFilter === s} onClick={() => setStatusFilter(s === statusFilter ? 'active' : s)} />
           ))}
         </div>
       </div>
@@ -266,7 +272,7 @@ function KanbanView({ apps, onSelect }) {
 /* ── Status Dropdown ─────────────────────────────────────────── */
 function StatusDropdown({ current, reportNumber, onUpdate }) {
   const [open, setOpen] = useState(false);
-  const labels = { evaluated: 'Evaluated', applied: 'Applied', responded: 'Responded', interview: 'Interview', offer: 'Offer', rejected: 'Rejected', discarded: 'Discarded', skip: 'SKIP' };
+  const labels = { evaluated: 'Evaluated', interested: 'Interested', applied: 'Applied', responded: 'Responded', interview: 'Interview', offer: 'Offer', rejected: 'Rejected', discarded: 'Discarded', skip: 'SKIP' };
 
   return (
     <div className="relative">
