@@ -1,7 +1,7 @@
 import { Outlet, NavLink } from 'react-router-dom';
 import {
   LayoutDashboard, KanbanSquare, User, FileText,
-  Radar, ClipboardList, Globe, ChevronLeft, ChevronRight, Sparkles
+  Radar, ClipboardList, Globe, ChevronLeft, ChevronRight, Sparkles, Terminal
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -13,6 +13,7 @@ const NAV_ITEMS = [
   { to: '/scanner', icon: Radar, label: 'Scanner' },
   { to: '/reports', icon: ClipboardList, label: 'Reports' },
   { to: '/portals', icon: Globe, label: 'Portals' },
+  { to: '/terminal', icon: Terminal, label: 'Terminal' },
 ];
 
 export default function AppLayout() {

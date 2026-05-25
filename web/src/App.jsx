@@ -7,6 +7,7 @@ import CvEditorPage from './pages/CvEditorPage.jsx';
 import ScannerPage from './pages/ScannerPage.jsx';
 import ReportsPage from './pages/ReportsPage.jsx';
 import PortalsPage from './pages/PortalsPage.jsx';
+import TerminalPage from './pages/TerminalPage.jsx';
 
 export default function App() {
   return (
@@ -19,6 +20,7 @@ export default function App() {
         <Route path="scanner" element={<ScannerPage />} />
         <Route path="reports" element={<ReportsPage />} />
         <Route path="portals" element={<PortalsPage />} />
+        <Route path="terminal" element={<TerminalPage />} />
       </Route>
     </Routes>
   );

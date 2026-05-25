@@ -94,7 +94,12 @@ export function parseApplications(careerOpsRoot) {
       const remoteMatch = reportContent.match(/\*\*Remote\*\*\s*\|\s*(.+)/i);
       if (remoteMatch) app.remote = remoteMatch[1].replace(/\|/g, '').trim();
 
-      const legMatch = reportContent.match(/\*\*Legitimacy:\*\*\s*(.+)/i);
+      const compMatch = reportContent.match(/\*\*Comp\*\*\s*\|\s*(.+)/i)
+        || reportContent.match(/\*\*Compensation\*\*\s*\|\s*(.+)/i);
+      if (compMatch) app.comp = compMatch[1].replace(/\|/g, '').trim();
+
+      const legMatch = reportContent.match(/\*\*Legitimacy:\*\*\s*(.+)/i)
+        || reportContent.match(/\*\*Legitimidad:\*\*\s*(.+)/i);
       if (legMatch) app.legitimacy = legMatch[1].trim();
     } catch { /* report file not found — skip enrichment */ }
   }

@@ -12,6 +12,7 @@ import { createScannerRouter } from './routes/scanner.mjs';
 import { createPdfRouter } from './routes/pdf.mjs';
 import { createStatesRouter } from './routes/states.mjs';
 import { createMetricsRouter } from './routes/metrics.mjs';
+import { createTerminalRouter } from './routes/terminal.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -34,6 +35,7 @@ app.use('/api/scanner', createScannerRouter(CAREER_OPS_ROOT));
 app.use('/api/pdf', createPdfRouter(CAREER_OPS_ROOT));
 app.use('/api/states', createStatesRouter(CAREER_OPS_ROOT));
 app.use('/api/metrics', createMetricsRouter(CAREER_OPS_ROOT));
+app.use('/api/terminal', createTerminalRouter(CAREER_OPS_ROOT));
 
 // Health check
 app.get('/api/health', (_req, res) => {

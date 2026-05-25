@@ -64,4 +64,10 @@ export const api = {
 
   // Health
   health: () => fetchJSON('/health'),
+
+  // Terminal
+  sendTerminalInput: (input) =>
+    fetchJSON('/terminal/input', { method: 'POST', body: JSON.stringify({ input }) }),
+  killTerminalCommand: () =>
+    fetchJSON('/terminal/kill', { method: 'POST' }),
 };

@@ -6,7 +6,7 @@ import {
 } from '../components/ui/index.jsx';
 import {
   Search, SlidersHorizontal, LayoutGrid, Table2, ChevronDown,
-  ExternalLink, FileText, X, KanbanSquare
+  ExternalLink, FileText, X, KanbanSquare, Zap, MapPin, DollarSign, Calendar
 } from 'lucide-react';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -253,7 +253,21 @@ function KanbanView({ apps, onSelect }) {
                   <ScoreBadge score={app.score} />
                 </div>
                 <p className="text-xs text-white/50 truncate">{app.role}</p>
-                <div className="flex items-center justify-between mt-2">
+                {(app.remote || app.archetype) && (
+                  <div className="flex flex-wrap gap-1 mt-1.5">
+                    {app.remote && (
+                      <span className="text-[9px] px-1.5 py-0.5 rounded bg-status-applied/10 text-status-applied max-w-[120px] truncate">
+                        📍 {app.remote.replace(/\s*\(.*\)/, '').replace(/Full\s+/, '')}
+                      </span>
+                    )}
+                    {app.archetype && (
+                      <span className="text-[9px] px-1.5 py-0.5 rounded bg-primary-500/10 text-primary-300 max-w-[120px] truncate">
+                        🎭 {app.archetype.split('/')[0].split('|')[0].trim()}
+                      </span>
+                    )}
+                  </div>
+                )}
+                <div className="flex items-center justify-between mt-2 pt-2 border-t border-surface-300/5">
                   <span className="text-[10px] text-white/30 font-mono">{app.date}</span>
                   <div className="flex gap-1">
                     {app.hasPdf && <span className="text-[10px]">✅</span>}
@@ -334,17 +348,27 @@ function ReportPanel({ app, onClose, onStatusUpdate }) {
             {/* Metadata UI Badges */}
             <div className="flex flex-wrap items-center gap-2 mb-3">
               {app.date && (
-                <span className="px-2.5 py-1 bg-surface-200/50 text-white/60 text-xs rounded-md border border-surface-300/20 font-mono">
-                  🗓 {app.date}
+                <span className="px-2.5 py-1 bg-surface-200/50 text-white/60 text-xs rounded-md border border-surface-300/20 font-mono flex items-center gap-1">
+                  <Calendar className="w-3 h-3 text-white/40" /> {app.date}
                 </span>
               )}
               {app.archetype && (
-                <span className="px-2.5 py-1 bg-primary-500/10 text-primary-300 text-xs rounded-md border border-primary-500/20">
+                <span className="px-2.5 py-1 bg-primary-500/10 text-primary-300 text-xs rounded-md border border-primary-500/20 flex items-center gap-1">
                   🎭 {app.archetype}
                 </span>
               )}
+              {app.remote && (
+                <span className="px-2.5 py-1 bg-status-applied/10 text-status-applied text-xs rounded-md border border-status-applied/20 flex items-center gap-1">
+                  <MapPin className="w-3 h-3 text-status-applied/75" /> {app.remote}
+                </span>
+              )}
+              {app.comp && (
+                <span className="px-2.5 py-1 bg-status-responded/10 text-status-responded text-xs rounded-md border border-status-responded/20 font-mono flex items-center gap-1">
+                  <DollarSign className="w-3 h-3 text-status-responded/75" /> {app.comp}
+                </span>
+              )}
               {app.legitimacy && (
-                <span className="px-2.5 py-1 bg-status-interview/10 text-status-interview text-xs rounded-md border border-status-interview/20">
+                <span className="px-2.5 py-1 bg-status-interview/10 text-status-interview text-xs rounded-md border border-status-interview/20 flex items-center gap-1">
                   🛡️ {app.legitimacy}
                 </span>
               )}
@@ -370,13 +394,25 @@ function ReportPanel({ app, onClose, onStatusUpdate }) {
         </div>
 
         {/* Scrollable Content */}
-        <div className="flex-1 overflow-y-auto px-8 pb-16 pt-4 relative">
+        <div className="flex-1 overflow-y-auto px-8 pb-16 pt-6 relative">
           {isLoading ? (
             <div className="animate-pulse space-y-4">
               {[...Array(10)].map((_, i) => <div key={i} className="h-4 bg-surface-200 rounded" style={{ width: `${60 + Math.random() * 40}%` }} />)}
             </div>
           ) : data?.content ? (
-            <div className="prose prose-invert prose-base max-w-none prose-headings:font-heading prose-headings:text-primary-300 prose-headings:font-semibold prose-h2:sticky prose-h2:top-[-17px] prose-h2:bg-surface-50/95 prose-h2:backdrop-blur-md prose-h2:py-3 prose-h2:px-8 prose-h2:-mx-8 prose-h2:z-10 prose-h2:border-b prose-h2:border-surface-300/30 prose-h2:mt-8 prose-h2:shadow-sm prose-a:text-primary-400 prose-strong:text-white/90 prose-th:bg-surface-200/50 prose-th:px-4 prose-th:py-2.5 prose-th:text-white/80 prose-td:px-4 prose-td:py-2.5 prose-td:border-b prose-td:border-surface-300/20 prose-tr:hover:bg-surface-200/20 prose-table:border prose-table:border-surface-300/30 prose-table:rounded-lg prose-table:overflow-hidden">
+            <div className="space-y-6">
+              {app.tldr && (
+                <div className="bg-primary-500/5 border border-primary-500/10 rounded-xl p-4 flex gap-3.5 items-start">
+                  <div className="mt-0.5 shrink-0 bg-primary-500/10 p-1.5 rounded-lg border border-primary-500/20">
+                    <Zap className="w-4 h-4 text-primary-400 fill-primary-400/20" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-semibold text-primary-300 uppercase tracking-wider mb-1 font-mono">Quick Summary / TL;DR</h4>
+                    <p className="text-sm text-white/80 leading-relaxed italic">{app.tldr}</p>
+                  </div>
+                </div>
+              )}
+              <div className="prose prose-invert prose-base max-w-none prose-headings:font-heading prose-headings:text-primary-300 prose-headings:font-semibold prose-h2:sticky prose-h2:top-[-17px] prose-h2:bg-surface-50/95 prose-h2:backdrop-blur-md prose-h2:py-3 prose-h2:px-8 prose-h2:-mx-8 prose-h2:z-10 prose-h2:border-b prose-h2:border-surface-300/30 prose-h2:mt-8 prose-h2:shadow-sm prose-a:text-primary-400 prose-strong:text-white/90 prose-th:bg-surface-200/50 prose-th:px-4 prose-th:py-2.5 prose-th:text-white/80 prose-td:px-4 prose-td:py-2.5 prose-td:border-b prose-td:border-surface-300/20 prose-tr:hover:bg-surface-200/20 prose-table:border prose-table:border-surface-300/30 prose-table:rounded-lg prose-table:overflow-hidden">
               <Markdown remarkPlugins={[remarkGfm]}>
                 {data.content
                   .replace(/^#\s+.*$/m, '') // Remove redundant H1 title
@@ -386,7 +422,7 @@ function ReportPanel({ app, onClose, onStatusUpdate }) {
                   .trim()
                 }
               </Markdown>
-            </div>
+            </div></div>
           ) : (
             <p className="text-white/40 text-sm">Report not available</p>
           )}
