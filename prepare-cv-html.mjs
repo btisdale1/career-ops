@@ -52,8 +52,8 @@ const replacements = {
   SECTION_EDUCATION: "Education",
   SECTION_CERTIFICATIONS: "Certifications",
   SECTION_SKILLS: "Technical Skills",
-  SUMMARY_TEXT: sections['SUMMARY'] ? sections['SUMMARY'].join(' ').trim() : '',
-  COMPETENCIES: "", // Will fill if needed
+  SUMMARY_TEXT: (sections['SUMMARY'] || sections['PROFESSIONAL SUMMARY'] || []).join(' ').trim(),
+  COMPETENCIES: formatCompetencies(sections['COMPETENCIES'] || sections['CORE COMPETENCIES'] || []),
   EXPERIENCE: formatExperience(sections['WORK EXPERIENCE'] || []),
   PROJECTS: "", // Will fill if needed
   EDUCATION: formatEducation(sections['EDUCATION'] || []),
@@ -82,6 +82,33 @@ function formatExperience(lines) {
     }
   }
   if (currentJob) html += renderJob(currentJob);
+  return html;
+}
+
+function formatProjects(lines) {
+  let html = '';
+  const text = lines.join('\n').trim();
+  if (!text) return '';
+  // Simple pass-through for now or more complex logic if needed
+  return text;
+}
+
+function formatCertifications(lines) {
+  let html = '';
+  const text = lines.join('\n').trim();
+  if (!text) return '';
+  return text;
+}
+
+function formatCompetencies(lines) {
+  let html = '';
+  const text = lines.join(' ').trim();
+  if (!text) return '';
+  
+  const items = text.split(/[•·|]|\s{2,}/).map(i => i.trim()).filter(Boolean);
+  for (const item of items) {
+    html += `<div class="competency-tag">${item}</div>`;
+  }
   return html;
 }
 
@@ -146,7 +173,54 @@ function formatSkills(lines) {
 }
 
 let finalHtml = template;
-for (const [key, value] of Object.entries(replacements)) {
+
+// Map actual formatted values
+const contentReplacements = {
+  SUMMARY_TEXT: (sections['SUMMARY'] || sections['PROFESSIONAL SUMMARY'] || []).join('\n').trim(),
+  COMPETENCIES: formatCompetencies(sections['COMPETENCIES'] || sections['CORE COMPETENCIES'] || []),
+  EXPERIENCE: formatExperience(sections['WORK EXPERIENCE'] || []),
+  PROJECTS: formatProjects(sections['PROJECTS'] || sections['KEY PROJECTS'] || []),
+  EDUCATION: formatEducation(sections['EDUCATION'] || []),
+  CERTIFICATIONS: formatCertifications(sections['CERTIFICATIONS'] || []),
+  SKILLS: formatSkills(sections['SKILLS'] || [])
+};
+
+// Debug: Check lengths of content
+for (const [key, value] of Object.entries(contentReplacements)) {
+  console.log(`Debug: Section ${key} content length: ${value.length}`);
+}
+
+// Helper to remove empty sections from the template using comment markers
+function removeEmptySection(html, sectionName, value) {
+  if (!value || value.trim() === '' || value === '<div class="skills-grid"></div>') {
+    // Match from the comment marker to just before the next comment marker or end of body
+    const regex = new RegExp(`<!--\\s*${sectionName}\\s*-->[^]*?(?=<!--|</body>|$)`, 'g');
+    return html.replace(regex, '');
+  }
+  return html;
+}
+
+const sectionMarkers = {
+  SUMMARY_TEXT: 'PROFESSIONAL SUMMARY',
+  COMPETENCIES: 'CORE COMPETENCIES',
+  EXPERIENCE: 'WORK EXPERIENCE',
+  PROJECTS: 'PROJECTS',
+  EDUCATION: 'EDUCATION',
+  CERTIFICATIONS: 'CERTIFICATIONS',
+  SKILLS: 'SKILLS'
+};
+
+// Remove empty sections BEFORE replacing anything
+for (const [key, value] of Object.entries(contentReplacements)) {
+  const marker = sectionMarkers[key];
+  if (marker) {
+    finalHtml = removeEmptySection(finalHtml, marker, value);
+  }
+}
+
+// Now do all replacements
+const allReplacements = { ...replacements, ...contentReplacements };
+for (const [key, value] of Object.entries(allReplacements)) {
   finalHtml = finalHtml.replaceAll(`{{${key}}}`, value);
 }
 
